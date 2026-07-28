@@ -1,0 +1,21 @@
+//
+//  AppColors.swift
+//  ToDoList
+//
+//  Created by Vit Chernuhin on 28.07.2026.
+//
+
+
+import UIKit
+
+enum AppColors {
+    static let appBackground = UIColor(hex: "#040404")
+    static let primaryText = UIColor(hex: "#F4F4F4")
+    static let secondaryText = UIColor(hex: "#7C7C7C")
+    static let searchTint = UIColor(hex: "#8D8D8E")
+    static let goldTint = UIColor(hex: "#F8D949")
+    
+    static let menuText = UIColor(hex: "#040404")
+    static let deleteMenuText = UIColor(hex: "#C52925")
+    static let menuBackground = UIColor(hex: "#C0C0C0")
+}

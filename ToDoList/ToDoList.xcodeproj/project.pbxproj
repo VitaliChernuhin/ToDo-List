@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5F4E764B3017ACE400E39930 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5F4E764A3017ACE400E39930 /* Moya */; };
+		5F4E764E3017B11000E39930 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 5F4E764D3017B11000E39930 /* Swinject */; };
+		5F4E76513017B18800E39930 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5F4E76503017B18800E39930 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		5F4E74B93017A60500E39930 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +71,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F4E76513017B18800E39930 /* SnapKit in Frameworks */,
+				5F4E764B3017ACE400E39930 /* Moya in Frameworks */,
+				5F4E764E3017B11000E39930 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +134,9 @@
 			);
 			name = ToDoList;
 			packageProductDependencies = (
+				5F4E764A3017ACE400E39930 /* Moya */,
+				5F4E764D3017B11000E39930 /* Swinject */,
+				5F4E76503017B18800E39930 /* SnapKit */,
 			);
 			productName = ToDoList;
 			productReference = 5F4E749F3017A60200E39930 /* ToDoList.app */;
@@ -208,6 +220,11 @@
 			);
 			mainGroup = 5F4E74963017A60200E39930;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5F4E76493017ACE400E39930 /* XCRemoteSwiftPackageReference "Moya" */,
+				5F4E764C3017B11000E39930 /* XCRemoteSwiftPackageReference "Swinject" */,
+				5F4E764F3017B18800E39930 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5F4E74A03017A60200E39930 /* Products */;
 			projectDirPath = "";
@@ -597,6 +614,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5F4E76493017ACE400E39930 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+		5F4E764C3017B11000E39930 /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.0;
+			};
+		};
+		5F4E764F3017B18800E39930 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5F4E764A3017ACE400E39930 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5F4E76493017ACE400E39930 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		5F4E764D3017B11000E39930 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5F4E764C3017B11000E39930 /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
+		5F4E76503017B18800E39930 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5F4E764F3017B18800E39930 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5F4E74973017A60200E39930 /* Project object */;
 }

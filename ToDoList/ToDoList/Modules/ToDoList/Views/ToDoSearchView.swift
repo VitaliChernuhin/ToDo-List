@@ -14,17 +14,22 @@ final class ToDoSearchView: UIView {
     
     private let textField: UITextField = {
         let field = UITextField()
-        field.placeholder = "Поиск"
+
+        field.attributedPlaceholder = NSAttributedString(
+            string: "Поиск",
+            attributes: [.foregroundColor: AppColors.searchTint]
+        )
+        
         field.textColor = AppColors.primaryText
         field.font = AppFonts.searchBody
         field.backgroundColor = AppColors.searchBackground
      
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 36, height: 0))
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 29, height: 0))
         field.leftView = paddingView
         field.leftViewMode = .always
         return field
     }()
-    
+
     private let searchIconView: UIImageView = {
         let icon = UIImageView(image: AppIcons.ToDoList.search)
         icon.tintColor = AppColors.searchTint
@@ -32,13 +37,8 @@ final class ToDoSearchView: UIView {
         return icon
     }()
     
-    private let micButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(AppIcons.ToDoList.microphone, for: .normal)
-        button.tintColor = AppColors.searchTint
-        return button
-    }()
-    
+    private let micButton = ToDoMicControl()
+
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -64,20 +64,20 @@ final class ToDoSearchView: UIView {
     private func setupConstraints() {
         textField.snp.makeConstraints { make in
             make.leading.top.bottom.equalToSuperview()
-            make.trailing.equalToSuperview().offset(-40) // Офсет под кнопку микрофона
+            make.trailing.equalToSuperview().offset(-30) // Офсет под кнопку микрофона
         }
         
         searchIconView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(6)
+            make.leading.equalToSuperview().offset(8)
             make.centerY.equalToSuperview()
-            make.height.equalTo(22)
-            make.width.equalTo(20)
+            make.height.equalTo(18)
+            make.width.equalTo(16)
         }
-        
+
         micButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-8)
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(24)
+            make.trailing.equalToSuperview().offset(2)
+            make.centerY.equalTo(searchIconView.snp.centerY)
+            make.width.height.equalTo(36)
         }
     }
 }

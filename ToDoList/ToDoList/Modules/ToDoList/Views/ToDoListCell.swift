@@ -13,8 +13,7 @@ final class ToDoListCell: UITableViewCell {
     // MARK: - UI Elements
     
     private let checkboxButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.tintColor = AppColors.goldTint
+        let button = UIButton(type: .custom)
         return button
     }()
     

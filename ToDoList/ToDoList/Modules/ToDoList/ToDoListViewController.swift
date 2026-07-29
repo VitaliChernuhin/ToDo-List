@@ -26,6 +26,12 @@ final class ToDoListViewController: UIViewController, ToDoListView, Logable {
         ToDoSearchView()
     }()
     
+    private let footerView: ToDoFooterView = {
+        let footerView = ToDoFooterView()
+        footerView.updateTaskCount(0)
+        return footerView
+    }()
+    
     private var dataSource: UITableViewDiffableDataSource<ToDoListSection, ToDoItemViewModel>?
     
     // MARK: - Life cycle
@@ -36,6 +42,8 @@ final class ToDoListViewController: UIViewController, ToDoListView, Logable {
         setupUI()
         setupConstraints()
         setupDataSource()
+        
+        setupTestMocks()
         
         //        presenter?.viewDidLoad()
     }
@@ -69,6 +77,7 @@ private extension ToDoListViewController {
         view.addSubview(headerLabel)
         view.addSubview(searchView)
         view.addSubview(tableView)
+        view.addSubview(footerView)
     }
     
     func setupConstraints() {
@@ -89,7 +98,13 @@ private extension ToDoListViewController {
             make.top.equalTo(searchView.snp.bottom).offset(16)
             make.leading.equalTo(searchView.snp.leading)
             make.trailing.equalTo(searchView.snp.trailing)
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+            make.bottom.equalTo(footerView.snp.top)
+        }
+        
+        footerView.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(UIDevice.isSmallScreen ? -49 : -74)
         }
     }
     
@@ -103,5 +118,43 @@ private extension ToDoListViewController {
             cell.configure(with: itemViewModel)
             return cell
         }
+    }
+}
+
+private extension ToDoListViewController {
+    func setupTestMocks() {
+        let mockTasks: [ToDoItemViewModel] = [
+            ToDoItemViewModel(
+                id: 1,
+                title: "Купить молоко",
+                description: "В магазине у дома, жирность 3.2%, желательно Простоквашино",
+                dateString: "28.07.26",
+                isCompleted: false
+            ),
+            ToDoItemViewModel(
+                id: 2,
+                title: "Позвонить маме",
+                description: "Узнать как дела, спросить про выходные и здоровье",
+                dateString: "27.07.26",
+                isCompleted: true // Проверим зачеркивание и приглушенный цвет!
+            ),
+            ToDoItemViewModel(
+                id: 3,
+                title: "Подготовить проект ToDoList",
+                description: "Разбить ячейки на extensions, настроить Diffable Data Source и запечатать кастомный футер на SnapKit",
+                dateString: "29.07.26",
+                isCompleted: false
+            ),
+            ToDoItemViewModel(
+                id: 4,
+                title: "ЛФК для спины",
+                description: "Сделать комплекс упражнений на 15 минут, чтобы шея не затекала от Xcode",
+                dateString: "25.07.26",
+                isCompleted: false
+            )
+        ]
+        
+        display(mockTasks)
+        footerView.updateTaskCount(mockTasks.count)
     }
 }

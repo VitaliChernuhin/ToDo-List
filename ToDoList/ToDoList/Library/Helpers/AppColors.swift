@@ -15,6 +15,7 @@ enum AppColors {
     static let searchBackground = UIColor(hex: "#272729")
     static let goldTint = UIColor(hex: "#F8D949")
     static let separatorTint = UIColor(hex: "#3C4147")
+    static let footerBackground = UIColor(hex: "#272729")
     
     static let menuText = UIColor(hex: "#040404")
     static let deleteMenuText = UIColor(hex: "#C52925")

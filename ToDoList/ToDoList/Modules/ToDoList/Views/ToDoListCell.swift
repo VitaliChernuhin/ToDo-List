@@ -93,6 +93,9 @@ private extension ToDoListCell {
         selectionStyle = .none
         backgroundColor = AppColors.appBackground
         
+        separatorInset = .zero
+        layoutMargins = .zero
+        
         contentView.addSubview(checkboxButton)
         contentView.addSubview(textStackView)
         

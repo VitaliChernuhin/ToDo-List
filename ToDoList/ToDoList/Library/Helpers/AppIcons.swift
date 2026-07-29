@@ -13,8 +13,8 @@ enum AppIcons {
         static let uncompleted = UIImage(named: "uncompleted_ic")
         static let completed = UIImage(named: "completed_ic")
         static let addNote = UIImage(named: "add_note_ic")
-        static let search = UIImage(named: "search")
-        static let microphone = UIImage(named: "mic")
+        static let search = UIImage(named: "search_ic")
+        static let microphone = UIImage(named: "mic_ic")
     }
     
     enum Menu {

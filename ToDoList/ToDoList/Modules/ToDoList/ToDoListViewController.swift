@@ -19,6 +19,7 @@ final class ToDoListViewController: UIViewController, ToDoListView, Logable {
         tableView.backgroundColor = AppColors.appBackground
         tableView.separatorColor = AppColors.separatorTint
         tableView.register(ToDoListCell.self, forCellReuseIdentifier: ToDoListCell.reuseIdentifier)
+        tableView.separatorInset = .zero
         return tableView
     }()
     

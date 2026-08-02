@@ -6,22 +6,37 @@
 //
 
 import CoreData
- 
-protocol WritableCoreDataStore {
-    
+
+protocol WritableCoreDataStore<Writable> {
     associatedtype Writable: NSManagedObject
     
-    func delete(entity: Writable)
-    func delete(entities: [Writable])
-    func deleteAll()
-    func deleteAll(in writableContext: NSManagedObjectContext)
-    func delete(
-        entity: Writable,
-        in writableContext: NSManagedObjectContext
+    func saveInBackground(
+        completionQueue: DispatchQueue,
+        block: @escaping (_ context: NSManagedObjectContext) -> Void,
+        completion: @escaping (Result<Void, Error>) -> Void
     )
     
-    func delete(
-        entities: [Writable],
-        in writableContext: NSManagedObjectContext
+    func deleteInBackground(
+        _ entity: Writable,
+        completionQueue: DispatchQueue,
+        completion: @escaping (Result<Void, Error>) -> Void
     )
+    
+    func deleteInBackground(
+        _ entities: [Writable],
+        completionQueue: DispatchQueue,
+        completion: @escaping (Result<Void, Error>) -> Void
+    )
+    
+    func deleteAllInBackground(
+        completionQueue: DispatchQueue,
+        completion: @escaping (Result<Void, Error>) -> Void
+    )
+    
+    // MARK: - Низкоуровневые кирпичики внутри конкретного контекста
+    
+    func save(in context: NSManagedObjectContext) throws
+    func delete(_ entity: Writable, in context: NSManagedObjectContext)
+    func delete(_ entities: [Writable], in context: NSManagedObjectContext)
+    func deleteAll(in context: NSManagedObjectContext) throws
 }

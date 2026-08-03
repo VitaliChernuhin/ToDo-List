@@ -99,6 +99,7 @@ final class CoreDataContextProviderImpl: CoreDataContextProvider {
         
         let context = container.newBackgroundContext()
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        context.automaticallyMergesChangesFromParent = true
         
         context.perform { [weak self] in
             guard let self = self else { return }

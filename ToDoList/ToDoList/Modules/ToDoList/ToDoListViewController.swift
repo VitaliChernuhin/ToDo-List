@@ -44,20 +44,21 @@ final class ToDoListViewController: UIViewController, ToDoListView, Logable {
         setupConstraints()
         setupDataSource()
         
-        setupTestMocks()
+//        setupTestMocks()
         
-        //        presenter?.viewDidLoad()
+        presenter?.handleEvent(.viewDidLoad)
     }
 }
 
-// MARK: - Public methods
+// MARK: - ToDoListView (implementation)
 extension ToDoListViewController {
+    
     func display(_ items: [ToDoItemViewModel]) {
         var snapshot = NSDiffableDataSourceSnapshot<ToDoListSection, ToDoItemViewModel>()
         snapshot.appendSections([.main])
         snapshot.appendItems(items, toSection: .main)
         dataSource?.apply(snapshot, animatingDifferences: true)
-        log(message: "Отображено элементов на экране: \(items.count)")
+        footerView.updateTaskCount(items.count)
     }
 }
 

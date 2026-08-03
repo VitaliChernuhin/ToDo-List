@@ -18,14 +18,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        assembler = Assembler([ToDoListAssembly()], container: container)
+        assembler = Assembler([ServicesAssembly(), ToDoListAssembly()], container: container)
         let window = UIWindow(windowScene: windowScene)
         let todoListVC = container.resolve(ToDoListViewController.self)!
         let navigationController = UINavigationController(rootViewController: todoListVC)
         window.rootViewController = navigationController
         self.window = window
         window.makeKeyAndVisible()
-        
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

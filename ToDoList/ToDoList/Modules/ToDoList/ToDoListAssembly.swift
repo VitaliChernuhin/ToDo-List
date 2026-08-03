@@ -12,42 +12,39 @@ final class ToDoListAssembly: Assembly {
     
     func assemble(container: Container) {
         
-        // 1. Регистрируем Interactor
-        container.register(ToDoListInteractor.self) { _ in
-            ToDoListInteractorImpl()
+        // 1. Собираем Презентер
+        container.register(ToDoListPresenter.self) { _ in
+            ToDoListPresenterImpl()
         }
         
-        // 2. Регистрируем Router
+        // 2. Собираем Интерактор
+        container.register(ToDoListInteractor.self) { resolver in
+            let storage = resolver.resolve(ToDoListStorage.self)!
+            return ToDoListInteractorImpl(storage: storage)
+        }
+        
+        // 3. Собираем Роутер
         container.register(ToDoListRouter.self) { _ in
             ToDoListRouterImpl()
         }
         
-        // 3. Регистрируем Presenter
-        container.register(ToDoListPresenter.self) { resolver in
-            let presenter = ToDoListPresenterImpl()
-            presenter.interactor = resolver.resolve(ToDoListInteractor.self)
-            presenter.router = resolver.resolve(ToDoListRouter.self)
-            return presenter
-        }
-        
-        // 4. Регистрируем View
+        // 4. Собираем Вью-Контроллер
         container.register(ToDoListViewController.self) { resolver in
             let viewController = ToDoListViewController()
-            let presenter = resolver.resolve(ToDoListPresenter.self)!
             
+            // Разрешаем зависимости через резолвер
+            let presenter = resolver.resolve(ToDoListPresenter.self)!
+            let interactor = resolver.resolve(ToDoListInteractor.self)!
+            let router = resolver.resolve(ToDoListRouter.self)!
+            
+            // Прошиваем ссылки по контрактам
             viewController.presenter = presenter
             presenter.view = viewController
-            
-            if let router = presenter.router as? ToDoListRouterImpl {
-                router.viewController = viewController
-            }
-            
-            if let interactor = presenter.interactor as? ToDoListInteractorImpl {
-                interactor.presenter = presenter as? ToDoListInteractorOutput
-            }
+            presenter.interactor = interactor
+            presenter.router = router
+            interactor.presenter = presenter as? ToDoListInteractorOutput
             
             return viewController
         }
     }
 }
-

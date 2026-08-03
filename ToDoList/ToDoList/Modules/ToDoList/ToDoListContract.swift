@@ -8,7 +8,7 @@ protocol ToDoListView: AnyObject {
 }
 
 // MARK: - Presenter (Интерфейс управления модулем)
-protocol ToDoListPresenter: AnyObject {
+protocol ToDoListPresenter: AnyObject, ViewEvenHandable {
     var view: ToDoListView? { get set }
     var interactor: ToDoListInteractor? { get set }
     var router: ToDoListRouter? { get set }
@@ -19,11 +19,14 @@ protocol ToDoListPresenter: AnyObject {
 // MARK: - Interactor (Интерфейс бизнес-логики)
 protocol ToDoListInteractor: AnyObject {
     var presenter: ToDoListInteractorOutput? { get set }
+    func fetchTasks()
 }
 
 // MARK: - Interactor Output (Обратный поток данных в Presenter)
 protocol ToDoListInteractorOutput: AnyObject {
+    func didFetchTasks(with result: Result<[ToDoItem], Error>)
 }
+
 
 // MARK: - Router (Интерфейс навигации)
 protocol ToDoListRouter: AnyObject {

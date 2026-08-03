@@ -31,7 +31,7 @@ enum CoreDataStorageError: Error, LocalizedError {
     }
 }
 
-protocol CoreDataStorage: AnyObject, ReadableCoreDataStore, WritableCoreDataStore {
+protocol CoreDataStorage<Storable>: AnyObject, ReadableCoreDataStore, WritableCoreDataStore where Writable == Storable {
     
 }
 

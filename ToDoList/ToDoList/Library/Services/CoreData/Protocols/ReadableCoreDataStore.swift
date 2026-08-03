@@ -7,7 +7,7 @@
 
 import CoreData
 
-protocol ReadableCoreDataStore {
+protocol ReadableCoreDataStore<Storable> {
     associatedtype Storable: NSManagedObject
     
     func fetchEntities(

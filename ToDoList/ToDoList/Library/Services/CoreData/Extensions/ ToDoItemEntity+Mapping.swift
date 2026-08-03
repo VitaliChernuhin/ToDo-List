@@ -8,14 +8,14 @@
 import CoreData
 
 extension ToDoItemEntity {
-    
-    func toViewModel() -> ToDoItemViewModel {
-        return ToDoItemViewModel(
+    func toDomain() -> ToDoItem {
+        return ToDoItem(
             id: self.id,
             title: self.title ?? "",
             description: self.taskDescription ?? "",
-            dateString: self.date ?? "",
+            date: self.date ?? Date(),
             isCompleted: self.isCompleted
         )
     }
 }
+

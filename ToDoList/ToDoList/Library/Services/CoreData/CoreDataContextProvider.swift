@@ -34,7 +34,7 @@ protocol CoreDataContextProvider: AnyObject {
                                 completion: @escaping (Result<Void, Error>) -> Void)
 }
 
-final class CoreDataContextProviderImpl: Logable {
+final class CoreDataContextProviderImpl: CoreDataContextProvider {
     
     // MARK: - Private properties
     
@@ -87,7 +87,7 @@ final class CoreDataContextProviderImpl: Logable {
     
     func performBackgroundTask(
         block: @escaping (_ writeContext: NSManagedObjectContext) -> Void,
-        completionQueue: DispatchQueue = .main,
+        receiveCompletionOn completionQueue: DispatchQueue = .main,
         completion: @escaping (Result<Void, Error>) -> Void
     ) {
         guard let container = persistentContainer else {

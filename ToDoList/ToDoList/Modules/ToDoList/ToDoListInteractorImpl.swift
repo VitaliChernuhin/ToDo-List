@@ -17,6 +17,8 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
     private let networkService: ToDoListNetworkService
     private let settingsStorage: SettingsStorage
     
+    private var cachedTasks: [ToDoItem] = []
+    
     // MARK: - Init
     init(
         storage: ToDoListStorage,
@@ -28,7 +30,7 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
         self.settingsStorage = settingsStorage
     }
     
-    // MARK: - ToDoListInteractor Realization
+    // MARK: - ToDoListInteractor (implementation)
     
     func fetchTasks() {
         if settingsStorage.settings.isFirstInitializedFromServer {
@@ -38,37 +40,73 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
         }
     }
     
-    // MARK: - Private Cascade Methods
+    func toggleTaskCompletion(id: Int64) {
+        guard let index = cachedTasks.firstIndex(where: { $0.id == id }) else {
+            log(message: "⚠️ Задача с id \(id) не найдена в кэше памяти для мутации флага")
+            return
+        }
+        
+        let targetTask = cachedTasks[index]
+        let updatedTask = ToDoItem(
+            id: targetTask.id,
+            title: targetTask.title,
+            description: targetTask.description,
+            date: targetTask.date,
+            isCompleted: !targetTask.isCompleted
+        )
+        
+        cachedTasks[index] = updatedTask
+        
+        storage.saveTask(updatedTask) { [weak self] saveResult in
+            guard let self = self else { return }
+            
+            switch saveResult {
+            case .success:
+                self.presenter?.didUpdateTasksState(with: .success(self.cachedTasks))
+                
+            case .failure(let error):
+                self.log(message: "🛑 [Interactor] Ошибка записи инвертированного статуса на диск: \(error.localizedDescription)")
+            }
+        }
+    }
+}
+
+// MARK: - Private methods
+private extension ToDoListInteractorImpl {
     
-    private func fetchLocalTasks() {
+    func fetchLocalTasks() {
         storage.fetchAllTasks { [weak self] result in
-            self?.presenter?.didFetchTasks(with: result)
+            guard let self = self else { return }
+            if case .success(let localItems) = result {
+                self.cachedTasks = localItems
+            }
+            self.presenter?.didUpdateTasksState(with: result)
         }
     }
     
-    private func fetchDataFromNetwork() {
-
+    func fetchDataFromNetwork() {
         networkService.fetchServerTodos { [weak self] networkResult in
             guard let self = self else { return }
             
             switch networkResult {
             case .success(let serverItems):
-
+                
+                self.cachedTasks = serverItems
                 self.saveServerItemsToLocalStorage(serverItems)
                 
                 var currentSettings = self.settingsStorage.settings
                 currentSettings.isFirstInitializedFromServer = true
                 self.settingsStorage.settings = currentSettings
                 
-                self.presenter?.didFetchTasks(with: .success(serverItems))
-              
+                self.presenter?.didUpdateTasksState(with: .success(serverItems))
+                
             case .failure(let networkError):
-                self.presenter?.didFetchTasks(with: .failure(networkError))
+                self.presenter?.didUpdateTasksState(with: .failure(networkError))
             }
         }
     }
     
-    private func saveServerItemsToLocalStorage(_ items: [ToDoItem]) {
+    func saveServerItemsToLocalStorage(_ items: [ToDoItem]) {
         for item in items {
             storage.saveTask(item) { [weak self] result in
                 if case .failure(let error) = result {

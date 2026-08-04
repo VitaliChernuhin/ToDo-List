@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-// MARK: - ToDoListStorage Contract
+// MARK: - ToDoListStorage
 protocol ToDoListStorage: AnyObject {
     
     /// Выгружает все задачи из локального хранилища.
@@ -22,9 +22,19 @@ protocol ToDoListStorage: AnyObject {
     ///
     /// - Parameter completion: Замыкание, возвращающее результат вычитки: массив доменных моделей `[ToDoItem]` или ошибку.
     func fetchAllTasks(completion: @escaping (Result<[ToDoItem], Error>) -> Void)
-
+    
+    /// Асинхронно сохраняет новую или обновляет существующую задачу в локальной базе данных.
+    ///
+    /// Транзакция записи на диск и слияние изменений осуществляются в **фоновом контексте (backgroundContext)**,
+    /// что гарантирует стопроцентную отзывчивость интерфейса при параллельных мутациях данных.
+    /// Статус завершения операции безопасно доставляется на **главный поток (mainQueue)**.
+    ///
+    /// - Parameters:
+    ///   - task: Доменная модель задачи `ToDoItem`, подлежащая фиксации на диске.
+    ///   - completion: Замыкание, возвращающее статус успеха (Void) или ошибку транзакции.
     func saveTask(_ task: ToDoItem, completion: @escaping (Result<Void, Error>) -> Void)
 }
+
 
 // MARK: - ToDoListStorage Implementation
 final class ToDoListStorageImpl: ToDoListStorage, Logable {

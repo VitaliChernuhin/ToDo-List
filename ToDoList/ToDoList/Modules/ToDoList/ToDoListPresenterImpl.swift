@@ -1,7 +1,6 @@
 import Foundation
 
 final class ToDoListPresenterImpl: ToDoListPresenter, Logable {
-   
     weak var view: ToDoListView?
     var interactor: ToDoListInteractor?
     var router: ToDoListRouter?
@@ -17,17 +16,28 @@ extension ToDoListPresenterImpl {
        }
 }
 
-// MARK: - ToDoListPresenter (implementaion)
-extension ToDoListPresenterImpl {
-    func didUpdateSearchQuery(_ query: String) {
-        
+// MARK: - ViewActionHandable (implementation)
+extension ToDoListPresenterImpl: ViewActionHandable {
+    typealias Action = ToDoListAction
+    
+    func handleAction(_ action: ToDoListAction) {
+        switch action {
+        case .didTapCheckbox(item: let viewModelItem):
+            
+            interactor?.toggleTaskCompletion(id: viewModelItem.id)
+            
+        case .didUpdateSearchQuery(let query):
+            break
+            
+        case .didSwipeToDelete(item: let viewModelItem):
+            break
+        }
     }
 }
 
 // MARK: - ToDoListInteractorOutput (implementation)
 extension ToDoListPresenterImpl: ToDoListInteractorOutput {
-    
-    func didFetchTasks(with result: Result<[ToDoItem], Error>) {
+    func didUpdateTasksState(with result: Result<[ToDoItem], any Error>) {
         switch result {
         case .success(let domainItems):
             let dateFormatter = DateFormatterProvider.formatter(for: .shortUIDate)

@@ -3,7 +3,7 @@ import SnapKit
 
 final class ToDoListViewController: UIViewController, ToDoListView, Logable {
     
-    var presenter: ToDoListPresenter?
+    var presenter: (any ToDoListPresenter)?
     
     // MARK: - UI Elements
     private let headerLabel: UILabel = {
@@ -110,14 +110,18 @@ private extension ToDoListViewController {
         }
     }
     
-    func setupDataSource() {
-        dataSource = UITableViewDiffableDataSource<ToDoListSection, ToDoItemViewModel>(tableView: tableView) { (tableView, indexPath, itemViewModel) -> UITableViewCell? in
+    private func setupDataSource() {
+        dataSource = UITableViewDiffableDataSource<ToDoListSection, ToDoItemViewModel>(tableView: tableView) { [weak self] tableView, indexPath, viewModel in
+            guard let self = self else { return UITableViewCell() }
             
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: ToDoListCell.reuseIdentifier, for: indexPath) as? ToDoListCell else {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoListCell", for: indexPath) as? ToDoListCell else {
                 return UITableViewCell()
             }
             
-            cell.configure(with: itemViewModel)
+            cell.configure(with: viewModel)
+            cell.onCheckboxTap = {
+                self.presenter?.handleAction(.didTapCheckbox(item: viewModel))
+            }
             return cell
         }
     }

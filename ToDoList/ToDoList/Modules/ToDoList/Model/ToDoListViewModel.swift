@@ -14,7 +14,6 @@ nonisolated enum ToDoListSection: Hashable, Sendable {
 
 // MARK: - Модель отображения задачи (ViewModel ячейки)
 nonisolated struct ToDoItemViewModel: Hashable, Sendable {
-    let uuid = UUID() 
     let id: Int64
     let title: String
     let description: String

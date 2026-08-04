@@ -10,6 +10,8 @@ import SnapKit
 
 final class ToDoListCell: UITableViewCell {
     
+    var onCheckboxTap: (() -> Void)?
+    
     // MARK: - UI Elements
     
     private let checkboxButton: UIButton = {
@@ -54,6 +56,7 @@ final class ToDoListCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupCell()
+        setupActions()
         setupConstraints()
     }
     
@@ -79,6 +82,7 @@ final class ToDoListCell: UITableViewCell {
             titleLabel.attributedText = attributeString
             titleLabel.textColor = AppColors.secondaryText
         } else {
+            titleLabel.attributedText = nil
             checkboxButton.setImage(AppIcons.ToDoList.uncompleted, for: .normal)
             titleLabel.attributedText = nil
             titleLabel.text = model.title
@@ -104,6 +108,10 @@ private extension ToDoListCell {
         textStackView.addArrangedSubview(dateLabel)
     }
     
+    func setupActions() {
+        checkboxButton.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
+    }
+    
     func setupConstraints() {
         checkboxButton.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -117,5 +125,11 @@ private extension ToDoListCell {
             make.top.equalToSuperview().offset(12)
             make.bottom.equalToSuperview().offset(-12)
         }
+    }
+}
+
+private extension ToDoListCell {
+    @objc func checkboxTapped() {
+           onCheckboxTap?()
     }
 }

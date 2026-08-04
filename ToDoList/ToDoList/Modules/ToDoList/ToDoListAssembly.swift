@@ -20,7 +20,9 @@ final class ToDoListAssembly: Assembly {
         // 2. Собираем Интерактор
         container.register(ToDoListInteractor.self) { resolver in
             let storage = resolver.resolve(ToDoListStorage.self)!
-            return ToDoListInteractorImpl(storage: storage)
+            let networkService = resolver.resolve(ToDoListNetworkService.self)!
+            let settingsStorage = resolver.resolve(SettingsStorage.self)!
+            return ToDoListInteractorImpl(storage: storage, networkService: networkService, settingsStorage: settingsStorage)
         }
         
         // 3. Собираем Роутер

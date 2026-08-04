@@ -35,5 +35,14 @@ final class ServicesAssembly: Assembly, Logable {
             let coreDataStorage = resolver.resolve((any CoreDataStorage<ToDoItemEntity>).self)!
             return ToDoListStorageImpl(coreDataStorage: coreDataStorage)
         }
+        
+        container.register(ToDoListNetworkService.self) { _ in
+            ToDoListNetworkServiceImpl()
+        }
+        
+        container.register(SettingsStorage.self) { _ in
+            SettingsStorageImpl()
+        }.inObjectScope(.container)
+
     }
 }

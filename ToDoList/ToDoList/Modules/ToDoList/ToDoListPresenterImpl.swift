@@ -30,17 +30,20 @@ extension ToDoListPresenterImpl: ToDoListInteractorOutput {
     func didFetchTasks(with result: Result<[ToDoItem], Error>) {
         switch result {
         case .success(let domainItems):
+            let dateFormatter = DateFormatterProvider.formatter(for: .shortUIDate)
             let viewModels = domainItems.map { item in
                 ToDoItemViewModel(
                     id: item.id,
                     title: item.title,
                     description: item.description,
-                    dateString: "03.08.2026", // Здесь Презентер b2b-безопасно форматирует дату для UI
+                    dateString: dateFormatter.string(from: item.date),
                     isCompleted: item.isCompleted
                 )
             }
-            view?.display(viewModels)
             
+            DispatchQueue.main.async { [weak self] in
+                self?.view?.display(viewModels)
+            }
         case .failure(let error):
             log(message: "🛑 Ошибка при получении задач из Интерактора: \(error.localizedDescription)")
         }

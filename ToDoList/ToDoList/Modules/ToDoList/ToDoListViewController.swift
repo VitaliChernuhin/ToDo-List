@@ -42,10 +42,15 @@ final class ToDoListViewController: UIViewController, ToDoListView, Logable {
         setupNavigation()
         setupUI()
         setupConstraints()
+        
         tableView.delegate = self
         setupDataSource()
+        tableView.keyboardDismissMode = .onDrag
+        setupKeyboardDismissGesture()
         
-//        setupTestMocks()
+        setupSearchConfiguration()
+        
+        //        setupTestMocks()
         
         presenter?.handleEvent(.viewDidLoad)
     }
@@ -126,6 +131,12 @@ private extension ToDoListViewController {
             return cell
         }
     }
+    
+    private func setupSearchConfiguration() {
+        searchView.onTextDidChange = { [weak self] searchText in
+            self?.presenter?.handleAction(.didUpdateSearchQuery(query: searchText))
+        }
+    }
 }
 
 // MARK: - UITableViewDelegate (implementation)
@@ -163,7 +174,21 @@ extension ToDoListViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - Setup keyboard dissmise managment (private)
+private extension ToDoListViewController {
+    // MARK: - Keyboard Management (Комбинированная защита)
+    func setupKeyboardDismissGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
 
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+// MARK: - Setup mocks (private)
 private extension ToDoListViewController {
     func setupTestMocks() {
         let mockTasks: [ToDoItemViewModel] = [

@@ -52,7 +52,7 @@ final class ToDoListCell: UITableViewCell {
         return stack
     }()
     
-    // MARK: - Init
+    // MARK: - Life cycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupCell()
@@ -62,6 +62,21 @@ final class ToDoListCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        titleLabel.attributedText = nil
+        titleLabel.text = nil
+        titleLabel.textColor = AppColors.primaryText
+        
+        descriptionLabel.text = nil
+        dateLabel.text = nil
+        
+        checkboxButton.setImage(nil, for: .normal)
+        
+        onCheckboxTap = nil
     }
     
     // MARK: - Public Configuration Method

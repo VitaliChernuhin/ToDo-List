@@ -26,7 +26,7 @@ extension ToDoListPresenterImpl: ViewActionHandable {
             interactor?.toggleTaskCompletion(id: viewModelItem.id)
             
         case .didUpdateSearchQuery(let query):
-            break
+            interactor?.searchTasks(query: query)
             
         case .didSwipeToDelete(item: let viewModelItem):
             interactor?.deleteTask(id: viewModelItem.id)

@@ -9,13 +9,14 @@ import Foundation
 
 final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
     
-    // MARK: - VIPER Ссылки
     weak var presenter: ToDoListInteractorOutput?
     
     // MARK: - Private properties
     private let storage: ToDoListStorage
     private let networkService: ToDoListNetworkService
     private let settingsStorage: SettingsStorage
+    
+    private var searchWorkItem: DispatchWorkItem?
     
     private var cachedTasks: [ToDoItem] = []
     
@@ -65,14 +66,14 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
                 self.presenter?.didUpdateTasksState(with: .success(self.cachedTasks))
                 
             case .failure(let error):
-                self.log(message: "🛑 [Interactor] Ошибка записи инвертированного статуса на диск: \(error.localizedDescription)")
+                self.log(message: "🛑 Ошибка записи инвертированного статуса на диск: \(error.localizedDescription)")
             }
         }
     }
     
     func deleteTask(id: Int64) {
         guard let index = taskIndex(by: id) else {
-            log(message: "⚠️ [Interactor] Задача с id \(id) не найдена в кэше для удаления")
+            log(message: "⚠️ Задача с id \(id) не найдена в кэше для удаления")
             return
         }
         
@@ -86,6 +87,37 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
                 self?.log(message: "🛑 Ошибка фонового удаления задачи \(id) с диска: \(error.localizedDescription)")
             }
         }
+    }
+    
+    func searchTasks(query: String) {
+        // Мгновенно отменяем прошлый запланированный поиск, если юзер продолжает вводить буквы
+        searchWorkItem?.cancel()
+        
+        let sanitizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Если поисковая строка пустая — моментально сбрасываем поиск и возвращаем весь исходный State
+        guard !sanitizedQuery.isEmpty else {
+            presenter?.didUpdateTasksState(with: .success(cachedTasks))
+            return
+        }
+        
+        // Филтруем
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            
+            let filteredTasks = self.cachedTasks.filter { task in
+                let titleContains = task.title.localizedCaseInsensitiveContains(sanitizedQuery)
+                let descriptionContains = task.description.localizedCaseInsensitiveContains(sanitizedQuery)
+                
+                return titleContains || descriptionContains
+            }
+            
+            self.presenter?.didUpdateTasksState(with: .success(filteredTasks))
+        }
+        
+        self.searchWorkItem = workItem
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: workItem)
     }
 }
 

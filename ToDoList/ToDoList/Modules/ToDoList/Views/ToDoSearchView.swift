@@ -10,11 +10,15 @@ import SnapKit
 
 final class ToDoSearchView: UIView {
     
+    var onTextDidChange: ((String) -> Void)?
+    
     // MARK: - UI Elements
     
     private let textField: UITextField = {
         let field = UITextField()
-
+        
+        field.keyboardAppearance = .dark
+        
         field.attributedPlaceholder = NSAttributedString(
             string: "Поиск",
             attributes: [.foregroundColor: AppColors.searchTint]
@@ -23,13 +27,13 @@ final class ToDoSearchView: UIView {
         field.textColor = AppColors.primaryText
         field.font = AppFonts.searchBody
         field.backgroundColor = AppColors.searchBackground
-     
+        
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 29, height: 0))
         field.leftView = paddingView
         field.leftViewMode = .always
         return field
     }()
-
+    
     private let searchIconView: UIImageView = {
         let icon = UIImageView(image: AppIcons.ToDoList.search)
         icon.tintColor = AppColors.searchTint
@@ -38,12 +42,13 @@ final class ToDoSearchView: UIView {
     }()
     
     private let micButton = ToDoMicControl()
-
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
         setupConstraints()
+        setupActions()
     }
     
     required init?(coder: NSCoder) {
@@ -73,11 +78,23 @@ final class ToDoSearchView: UIView {
             make.height.equalTo(18)
             make.width.equalTo(16)
         }
-
+        
         micButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(2)
             make.centerY.equalTo(searchIconView.snp.centerY)
             make.width.height.equalTo(36)
         }
+    }
+}
+
+// MARK: - Setup actions (private)
+private extension ToDoSearchView {
+    
+    func setupActions() {
+        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        onTextDidChange?(textField.text ?? "")
     }
 }

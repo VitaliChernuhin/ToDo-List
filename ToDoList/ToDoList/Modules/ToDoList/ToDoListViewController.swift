@@ -42,6 +42,7 @@ final class ToDoListViewController: UIViewController, ToDoListView, Logable {
         setupNavigation()
         setupUI()
         setupConstraints()
+        tableView.delegate = self
         setupDataSource()
         
 //        setupTestMocks()
@@ -126,6 +127,42 @@ private extension ToDoListViewController {
         }
     }
 }
+
+// MARK: - UITableViewDelegate (implementation)
+extension ToDoListViewController: UITableViewDelegate {
+    
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        
+        // Это на 100% страхует от крэшей «Index out of range» при параллельном поиске!
+        guard let viewModelItem = dataSource?.itemIdentifier(for: indexPath) else {
+            return nil
+        }
+        
+        // Создаем нативное системное действие удаления
+        let deleteAction = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completionHandler in
+            guard let self = self else {
+                completionHandler(false)
+                return
+            }
+            
+            self.presenter?.handleAction(.didSwipeToDelete(item: viewModelItem))
+            completionHandler(true)
+        }
+        
+        deleteAction.backgroundColor = .systemRed
+        deleteAction.image = UIImage(systemName: "trash.fill")
+        
+        // Собираем и возвращаем конфигурацию свайпа
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = true
+        
+        return configuration
+    }
+}
+
 
 private extension ToDoListViewController {
     func setupTestMocks() {

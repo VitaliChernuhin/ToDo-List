@@ -23,14 +23,13 @@ extension ToDoListPresenterImpl: ViewActionHandable {
     func handleAction(_ action: ToDoListAction) {
         switch action {
         case .didTapCheckbox(item: let viewModelItem):
-            
             interactor?.toggleTaskCompletion(id: viewModelItem.id)
             
         case .didUpdateSearchQuery(let query):
             break
             
         case .didSwipeToDelete(item: let viewModelItem):
-            break
+            interactor?.deleteTask(id: viewModelItem.id)
         }
     }
 }

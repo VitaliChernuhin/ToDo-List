@@ -20,6 +20,7 @@ protocol ToDoListInteractor: AnyObject {
     
     func fetchTasks()
     func toggleTaskCompletion(id: Int64)
+    func deleteTask(id: Int64)
 }
 
 // MARK: - Interactor Output (Обратный поток данных в Presenter)

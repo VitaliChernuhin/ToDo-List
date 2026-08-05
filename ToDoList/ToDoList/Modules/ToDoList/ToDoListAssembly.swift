@@ -13,7 +13,7 @@ final class ToDoListAssembly: Assembly {
     func assemble(container: Container) {
         
         // 1. Собираем Презентер
-        container.register(ToDoListPresenter.self) { _ in
+        container.register((any ToDoListPresenter).self) { _ in
             ToDoListPresenterImpl()
         }
         
@@ -35,7 +35,7 @@ final class ToDoListAssembly: Assembly {
             let viewController = ToDoListViewController()
             
             // Разрешаем зависимости через резолвер
-            let presenter = resolver.resolve(ToDoListPresenter.self)!
+            let presenter = resolver.resolve((any ToDoListPresenter).self)!
             let interactor = resolver.resolve(ToDoListInteractor.self)!
             let router = resolver.resolve(ToDoListRouter.self)!
             

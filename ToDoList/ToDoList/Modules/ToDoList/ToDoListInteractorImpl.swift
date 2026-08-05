@@ -41,7 +41,7 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
     }
     
     func toggleTaskCompletion(id: Int64) {
-        guard let index = cachedTasks.firstIndex(where: { $0.id == id }) else {
+        guard let index = taskIndex(by: id) else {
             log(message: "⚠️ Задача с id \(id) не найдена в кэше памяти для мутации флага")
             return
         }
@@ -66,6 +66,24 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
                 
             case .failure(let error):
                 self.log(message: "🛑 [Interactor] Ошибка записи инвертированного статуса на диск: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func deleteTask(id: Int64) {
+        guard let index = taskIndex(by: id) else {
+            log(message: "⚠️ [Interactor] Задача с id \(id) не найдена в кэше для удаления")
+            return
+        }
+        
+        let taskToDelete = cachedTasks[index]
+        cachedTasks.remove(at: index)
+        
+        presenter?.didUpdateTasksState(with: .success(cachedTasks))
+        
+        storage.deleteTask(taskToDelete) { [weak self] result in
+            if case .failure(let error) = result {
+                self?.log(message: "🛑 Ошибка фонового удаления задачи \(id) с диска: \(error.localizedDescription)")
             }
         }
     }
@@ -114,5 +132,9 @@ private extension ToDoListInteractorImpl {
                 }
             }
         }
+    }
+    
+    func taskIndex(by id: Int64) -> Int? {
+        cachedTasks.firstIndex(where: { $0.id == id })
     }
 }

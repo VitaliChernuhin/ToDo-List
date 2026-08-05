@@ -5,7 +5,6 @@
 //  Created by Vit Chernuhin on 03.08.2026.
 //
 
-
 import Foundation
 import CoreData
 
@@ -33,12 +32,14 @@ protocol ToDoListStorage: AnyObject {
     ///   - task: Доменная модель задачи `ToDoItem`, подлежащая фиксации на диске.
     ///   - completion: Замыкание, возвращающее статус успеха (Void) или ошибку транзакции.
     func saveTask(_ task: ToDoItem, completion: @escaping (Result<Void, Error>) -> Void)
+    
+    func deleteTask(_ task: ToDoItem, completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 
 // MARK: - ToDoListStorage Implementation
 final class ToDoListStorageImpl: ToDoListStorage, Logable {
-    
+ 
     private let coreDataStorage: any CoreDataStorage<ToDoItemEntity>
     
     init(coreDataStorage: any CoreDataStorage<ToDoItemEntity>) {
@@ -60,18 +61,26 @@ final class ToDoListStorageImpl: ToDoListStorage, Logable {
         }
     }
     
-    func saveTask(_ task: ToDoItem, completion: @escaping (Result<Void, Error>) -> Void) {
+    func saveTask(_ task: ToDoItem, completion: @escaping (Result<Void, any Error>) -> Void) {
         coreDataStorage.saveInBackground(completionQueue: .main) { context in
+            let request: NSFetchRequest<ToDoItemEntity> = ToDoItemEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %lld", task.id)
+            request.fetchLimit = 1
+            request.returnsObjectsAsFaults = false
             
-            let entity = ToDoItemEntity(context: context)
+            let entity = try context.fetch(request).first ?? ToDoItemEntity(context: context)
+            
             entity.id = task.id
             entity.title = task.title
             entity.taskDescription = task.description
             entity.isCompleted = task.isCompleted
             entity.date = task.date
-            
         } completion: { result in
             completion(result)
         }
+    }
+    
+    func deleteTask(_ task: ToDoItem, completion: @escaping (Result<Void, Error>) -> Void) {
+        coreDataStorage.deleteEntityInBackground("\(task.id)", completionQueue: .main, completion: completion)
     }
 }

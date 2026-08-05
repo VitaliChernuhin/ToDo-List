@@ -7,36 +7,18 @@
 
 import CoreData
 
-protocol WritableCoreDataStore<Writable> {
-    associatedtype Writable: NSManagedObject
+protocol WritableCoreDataStore {
+    associatedtype Writable
     
     func saveInBackground(
         completionQueue: DispatchQueue,
-        block: @escaping (_ context: NSManagedObjectContext) -> Void,
+        block: @escaping (_ context: NSManagedObjectContext) throws -> Void,
         completion: @escaping (Result<Void, Error>) -> Void
     )
     
-    func deleteInBackground(
-        _ entity: Writable,
+    func deleteEntityInBackground(
+        _ primaryKey: String,
         completionQueue: DispatchQueue,
         completion: @escaping (Result<Void, Error>) -> Void
     )
-    
-    func deleteInBackground(
-        _ entities: [Writable],
-        completionQueue: DispatchQueue,
-        completion: @escaping (Result<Void, Error>) -> Void
-    )
-    
-    func deleteAllInBackground(
-        completionQueue: DispatchQueue,
-        completion: @escaping (Result<Void, Error>) -> Void
-    )
-    
-    // MARK: - Низкоуровневые кирпичики внутри конкретного контекста
-    
-    func save(in context: NSManagedObjectContext) throws
-    func delete(_ entity: Writable, in context: NSManagedObjectContext)
-    func delete(_ entities: [Writable], in context: NSManagedObjectContext)
-    func deleteAll(in context: NSManagedObjectContext) throws
 }

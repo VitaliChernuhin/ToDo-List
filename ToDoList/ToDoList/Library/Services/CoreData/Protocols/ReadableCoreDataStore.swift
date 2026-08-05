@@ -10,40 +10,10 @@ import CoreData
 protocol ReadableCoreDataStore<Storable> {
     associatedtype Storable: NSManagedObject
     
-    func fetchEntities(
-        _ fetchOptions: FetchOptions,
-        in context: NSManagedObjectContext,
-        completion: @escaping (Result<[Storable], Error>) -> Void
-    )
-    
-    func fetchEntity(
-        _ primaryKey: String,
-        in context: NSManagedObjectContext,
-        completion: @escaping (Result<Storable?, Error>) -> Void
-    )
-    
-    // Методы с контекстом по умолчанию (viewContext)
+    // Метод с контекстом по умолчанию (viewContext)
     func fetchEntities(
         _ fetchOptions: FetchOptions,
         completion: @escaping (Result<[Storable], Error>) -> Void
-    )
-    
-    func fetchEntity(
-        _ primaryKey: String,
-        completion: @escaping (Result<Storable?, Error>) -> Void
-    )
-    
-    // Методы с backgroundContext
-    func fetchEntitiesInBackground(
-        _ fetchOptions: FetchOptions,
-        completionQueue: DispatchQueue,
-        completion: @escaping (Result<[Storable], Error>) -> Void
-    )
-
-    func fetchEntityInBackground(
-        _ primaryKey: String,
-        completionQueue: DispatchQueue,
-        completion: @escaping (Result<Storable?, Error>) -> Void
     )
 }
 

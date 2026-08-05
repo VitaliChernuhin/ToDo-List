@@ -28,10 +28,11 @@ protocol CoreDataContextProvider: AnyObject {
     
     func initialize(completion: @escaping (Result<Void, Error>) -> Void)
     var viewContext: NSManagedObjectContext? { get }
-    func makeBackgroundContext() -> NSManagedObjectContext?
-    func performBackgroundTask( block: @escaping (_ writeContext: NSManagedObjectContext) -> Void,
-                                receiveCompletionOn queue: DispatchQueue,
-                                completion: @escaping (Result<Void, Error>) -> Void)
+    func performBackgroundTask(
+        block: @escaping (_ writeContext: NSManagedObjectContext) throws -> Void ,
+        receiveCompletionOn completionQueue: DispatchQueue,
+        completion: @escaping (Result<Void, Error>) -> Void
+    )
 }
 
 final class CoreDataContextProviderImpl: CoreDataContextProvider {
@@ -76,17 +77,8 @@ final class CoreDataContextProviderImpl: CoreDataContextProvider {
         return persistentContainer?.viewContext
     }
     
-    func makeBackgroundContext() -> NSManagedObjectContext? {
-        guard isInitialized, let container = persistentContainer else {
-            return nil
-        }
-        let context = container.newBackgroundContext()
-        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-        return context
-    }
-    
     func performBackgroundTask(
-        block: @escaping (_ writeContext: NSManagedObjectContext) -> Void,
+        block: @escaping (_ writeContext: NSManagedObjectContext) throws -> Void ,
         receiveCompletionOn completionQueue: DispatchQueue = .main,
         completion: @escaping (Result<Void, Error>) -> Void
     ) {
@@ -105,7 +97,7 @@ final class CoreDataContextProviderImpl: CoreDataContextProvider {
             guard let self = self else { return }
             
             do {
-                block(context)
+                try block(context)
                 try context.save()
                 
                 // Создаем уведомление

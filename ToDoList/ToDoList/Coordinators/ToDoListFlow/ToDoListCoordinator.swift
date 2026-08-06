@@ -8,7 +8,7 @@
 import UIKit
 import Swinject
 
-final class ToDoListCoordinator: NSObject {
+final class ToDoListCoordinator: NSObject, FlowCoordinator {
     
     private let navigationController: UINavigationController
     private let container: Container

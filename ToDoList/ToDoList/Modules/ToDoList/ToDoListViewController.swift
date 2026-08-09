@@ -48,7 +48,7 @@ final class ToDoListViewController: UIViewController, ToDoListView, Logable {
         tableView.keyboardDismissMode = .onDrag
         setupKeyboardDismissGesture()
         
-        setupSearchConfiguration()
+        setupActions()
         
         //        setupTestMocks()
         
@@ -131,12 +131,6 @@ private extension ToDoListViewController {
             return cell
         }
     }
-    
-    private func setupSearchConfiguration() {
-        searchView.onTextDidChange = { [weak self] searchText in
-            self?.presenter?.handleAction(.didUpdateSearchQuery(query: searchText))
-        }
-    }
 }
 
 // MARK: - UITableViewDelegate (implementation)
@@ -171,6 +165,39 @@ extension ToDoListViewController: UITableViewDelegate {
         configuration.performsFirstActionWithFullSwipe = true
         
         return configuration
+    }
+}
+
+// MARK: - Setup actions (private)
+private extension ToDoListViewController {
+    
+    func setupActions() {
+        
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        longPressGesture.minimumPressDuration = 0.5
+        tableView.addGestureRecognizer(longPressGesture)
+        
+        footerView.onCreateTaskTap = { [weak self] in
+            self?.presenter?.handleAction(.didTapNew)
+        }
+        
+        searchView.onTextDidChange = { [weak self] searchText in
+            self?.presenter?.handleAction(.didUpdateSearchQuery(query: searchText))
+        }
+    }
+    
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+        
+        let touchPoint = gesture.location(in: tableView)
+        guard let indexPath = tableView.indexPathForRow(at: touchPoint) else { return }
+ 
+        guard let cell = tableView.cellForRow(at: indexPath),
+              let viewModelItem = dataSource?.itemIdentifier(for: indexPath) else { return }
+        
+        let cellGlobalRect = tableView.convert(cell.frame, to: view)
+        
+        presenter?.handleAction(.didLongTapItem(item: viewModelItem, rect: cellGlobalRect))
     }
 }
 

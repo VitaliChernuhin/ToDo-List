@@ -22,6 +22,7 @@ protocol ToDoListInteractor: AnyObject {
     func toggleTaskCompletion(id: Int64)
     func deleteTask(id: Int64)
     func searchTasks(query: String)
+    func task(by id: Int64) -> ToDoItem?
 }
 
 // MARK: - Interactor Output (Обратный поток данных в Presenter)
@@ -30,4 +31,4 @@ protocol ToDoListInteractorOutput: AnyObject {
 }
 
 // MARK: - Router (Интерфейс навигации)
-protocol ToDoListRouter: AnyObject {}
+protocol ToDoListRouter: Router where RouteAction == ToDoListRouteAction {}

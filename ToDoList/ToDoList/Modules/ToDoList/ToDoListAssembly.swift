@@ -26,18 +26,18 @@ final class ToDoListAssembly: Assembly {
         }
         
         // 3. Собираем Роутер
-        container.register(ToDoListRouter.self) { _ in
+        container.register((any ToDoListRouter).self) { _ in
             ToDoListRouterImpl()
         }
         
-        // 4. Собираем Вью-Контроллер
+        // 4. Собираем Вью-Контроллер, один в контейнере, т.к. нужен для проброски создания меню
         container.register(ToDoListViewController.self) { resolver in
             let viewController = ToDoListViewController()
             
             // Разрешаем зависимости через резолвер
             let presenter = resolver.resolve((any ToDoListPresenter).self)!
             let interactor = resolver.resolve(ToDoListInteractor.self)!
-            let router = resolver.resolve(ToDoListRouter.self)!
+            let router = resolver.resolve((any ToDoListRouter).self)!
             
             // Прошиваем ссылки по контрактам
             viewController.presenter = presenter
@@ -47,6 +47,13 @@ final class ToDoListAssembly: Assembly {
             interactor.presenter = presenter as? ToDoListInteractorOutput
             
             return viewController
+        }.inObjectScope(.container)
+        
+        // 5. Собираем ViewController для меню
+        container.register(ToDoItemMenuViewController.self) { resolver in
+            let toDoItemMenuViewController = ToDoItemMenuViewController()
+            
+            return toDoItemMenuViewController
         }
     }
 }

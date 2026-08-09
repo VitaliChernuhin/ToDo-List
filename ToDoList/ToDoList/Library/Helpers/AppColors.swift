@@ -20,4 +20,5 @@ enum AppColors {
     static let menuText = UIColor(hex: "#040404")
     static let deleteMenuText = UIColor(hex: "#C52925")
     static let menuBackground = UIColor(hex: "#C0C0C0")
+    static let menuTaskBackground = UIColor(hex: "#272729")
 }

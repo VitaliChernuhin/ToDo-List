@@ -119,6 +119,12 @@ final class ToDoListInteractorImpl: ToDoListInteractor, Logable {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: workItem)
     }
+    
+    func task(by id: Int64) -> ToDoItem? {
+        guard let index = taskIndex(by: id) else { return nil }
+        let toDoItem = cachedTasks[index]
+        return toDoItem
+    }
 }
 
 // MARK: - Private methods

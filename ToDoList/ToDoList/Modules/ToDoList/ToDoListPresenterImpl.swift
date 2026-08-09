@@ -8,12 +8,12 @@ final class ToDoListPresenterImpl: ToDoListPresenter, Logable {
 
 // MARK: - ViewEvenHandable (implementation))
 extension ToDoListPresenterImpl {
-       func handleEvent(_ event: ViewEvent) {
-           switch event {
-           case .viewDidLoad:
-               interactor?.fetchTasks()
-           }
-       }
+    func handleEvent(_ event: ViewEvent) {
+        switch event {
+        case .viewDidLoad:
+            interactor?.fetchTasks()
+        }
+    }
 }
 
 // MARK: - ViewActionHandable (implementation)
@@ -30,6 +30,19 @@ extension ToDoListPresenterImpl: ViewActionHandable {
             
         case .didSwipeToDelete(item: let viewModelItem):
             interactor?.deleteTask(id: viewModelItem.id)
+            
+        case .didTapNew:
+            log(message: "➕ Нажали создать новую задачу в футере")
+            
+        case .didLongTapItem(item: let viewModelItem, rect: let rect):
+            guard let domainItem = interactor?.task(by: viewModelItem.id) else { return }
+            
+            log(message: "🎯 Поймали лонг-тап на id: \(viewModelItem.id), уводим в Роутер")
+            router?.onRouteAction?(.openItemMenu(item: domainItem, rect: rect))
+            
+        case .didSelectMenuAction(action: let action):
+            // TODO: - Пробросить в Router
+            break
         }
     }
 }

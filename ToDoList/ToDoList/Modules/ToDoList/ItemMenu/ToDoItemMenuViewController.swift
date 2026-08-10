@@ -14,6 +14,14 @@ final class ToDoItemMenuViewController: UIViewController {
     var onActionSelected: ((ToDoListItemMenuAction) -> Void)?
     
     // MARK: - UI Elements
+    
+    let dimmingView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        view.alpha = 0
+        return view
+    }()
+    
     let blurEffectView = UIVisualEffectView(effect: nil)
     
     let toDoItemContainerView: UIView = {
@@ -26,7 +34,7 @@ final class ToDoItemMenuViewController: UIViewController {
     
     let toDoItemView = ToDoItemView()
     
-    private lazy var menuView: MenuView = {
+    lazy var menuView: MenuView = {
         let menu = MenuView(types: [.edit, .share, .delete])
         return menu
     }()
@@ -64,6 +72,7 @@ private extension ToDoItemMenuViewController {
     func setupUI() {
         view.backgroundColor = .clear
         
+        blurEffectView.contentView.addSubview(dimmingView)
         view.addSubview(blurEffectView)
         view.addSubview(toDoItemContainerView)
         toDoItemContainerView.addSubview(toDoItemView)
@@ -71,7 +80,12 @@ private extension ToDoItemMenuViewController {
     }
     
     func setupConstraints() {
+        
         blurEffectView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        dimmingView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
@@ -79,9 +93,8 @@ private extension ToDoItemMenuViewController {
             make.edges.equalToSuperview()
         }
         
-        
         // КРИТИЧЕСКИ ВАЖНО ДЛЯ ГЕОМЕТРИИ АНИМАТОРОВ:
-        // Констреинты для taskCardContainerView и menuView мы тут НЕ СТАВИМ! 🛑
+        // Констреинты для taskCardContainerView и menuView мы тут НЕ СТАВИМ!
         // Наш ToDoMenuPresentAnimator сам нагло привяжет их к координатам ячейки на экране!
     }
     

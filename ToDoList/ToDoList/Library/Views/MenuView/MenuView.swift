@@ -16,8 +16,8 @@ final class MenuView: UIView {
     private let stackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.backgroundColor = AppColors.separatorTint // Цвет тонкого разделителя между ячейками!
-        stack.spacing = 1 // Создает ту самую пиксель-перфект линию из макета
+        stack.backgroundColor = AppColors.menuSeparatorTint
+        stack.spacing = 0.5
         return stack
     }()
     

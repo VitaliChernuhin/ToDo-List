@@ -8,7 +8,7 @@
 import UIKit
 import Swinject
 
-final class ToDoListCoordinator: NSObject, FlowCoordinator {
+final class ToDoListCoordinator: NSObject, FlowCoordinator, Logable {
     
     private let navigationController: UINavigationController
     private let container: Container
@@ -24,28 +24,46 @@ final class ToDoListCoordinator: NSObject, FlowCoordinator {
     }
     
     func start() {
+        
         let taskListVC = container.resolve(ToDoListViewController.self)!
         navigationController.pushViewController(taskListVC, animated: false)
         currentFlow = .ToDoList
         
-        // Configurate route
-        let taskListRouter = container.resolve((any ToDoListRouter).self)!
-        taskListRouter.onRouteAction = { [weak self] action in
-            switch action {
-                
-            case .openCreateScreen:
-                break
-                
-            case .openEditScreen(item: let toDoItem):
-                break
-                
-            case .openItemMenu(item: let toDoItem, rect: let rect):
-                self?.openItemMenu(for: toDoItem, rect: rect, router: taskListRouter)
-                
-            case .triggerErrorAlert(message: let message):
-                break
+        if let presenter = taskListVC.presenter,
+           let router = presenter.router {
+            
+            router.onRouteAction = { [weak self] action in
+                guard let self = self else { return }
+                switch action {
+                case .openCreateScreen: break
+                case .openEditScreen: break
+                    
+                case let .openItemMenu(toDoItem, rect):
+                    self.openItemMenu(for: toDoItem, rect: rect, router: router)
+                    
+                case .triggerErrorAlert: break
+                }
             }
         }
+    }
+}
+
+// MARK: - UIViewControllerTransitioningDelegate (Движок Анимации)
+extension ToDoListCoordinator: UIViewControllerTransitioningDelegate {
+    
+    func animationController(
+        forPresented presented: UIViewController,
+        presenting: UIViewController,
+        source: UIViewController
+    ) -> UIViewControllerAnimatedTransitioning? {
+        log(message: "🚀 Запускаем кастомный ToDoMenuPresentAnimator для CGRect: \(sourceCellRect)")
+        return ToDoMenuPresentAnimator(sourceCellRect: sourceCellRect)
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        // Временная заглушка, пока не написали Dismiss-аниматор.
+        // Система закроет меню со стандартной системной анимацией альфы.
+        return nil
     }
 }
 
@@ -59,14 +77,14 @@ private extension ToDoListCoordinator {
         sourceCellRect = rect
         
         let menuVC = container.resolve(ToDoItemMenuViewController.self)!
-
+        
         menuVC.toDoItem = toDoItem
-//        menuVC.transitioningDelegate = self
-
+        menuVC.transitioningDelegate = self
+        
         // Накатываем данные на саму карточку перед показом
         menuVC.toDoItemView.configure(with: toDoItem)
-
+        
         navigationController.present(menuVC, animated: true)
-
+        
     }
 }

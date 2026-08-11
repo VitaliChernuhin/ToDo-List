@@ -41,6 +41,7 @@ private extension MenuView {
         backgroundColor = .clear
         layer.cornerRadius = 12
         clipsToBounds = true
+        translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(stackView)
     }

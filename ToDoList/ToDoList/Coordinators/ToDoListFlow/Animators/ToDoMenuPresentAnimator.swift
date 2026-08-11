@@ -35,6 +35,7 @@ final class ToDoMenuPresentAnimator: NSObject, UIViewControllerAnimatedTransitio
         // 2. Монтируем вьюху меню в общий системный контейнер транзишена
         containerView.addSubview(toVC.view)
         toVC.view.frame = containerView.bounds
+        toVC.toDoItemContainerView.translatesAutoresizingMaskIntoConstraints = false
         toVC.view.layoutIfNeeded()
         
         // 3. УСТАНАВЛИВАЕМ СТАРТОВУЮ ГЕОМЕТРИЮ (Карточка сидит точь-в-точь на месте ячейки таблицы!)

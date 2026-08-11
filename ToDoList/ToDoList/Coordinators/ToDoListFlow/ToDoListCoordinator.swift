@@ -39,7 +39,14 @@ final class ToDoListCoordinator: NSObject, FlowCoordinator, Logable {
                 case .openEditScreen: break
                     
                 case let .openItemMenu(toDoItem, rect):
-                    self.openItemMenu(for: toDoItem, rect: rect, router: router)
+                    self.openItemMenu(for: toDoItem, rect: rect)
+                    
+                case .dismisseItemMenu:
+                    guard navigationController.presentedViewController != nil
+                    else { return }
+                    navigationController.presentedViewController?.dismiss(animated: true) {
+                        self.currentFlow = .ToDoList
+                    }
                     
                 case .triggerErrorAlert: break
                 }
@@ -61,9 +68,7 @@ extension ToDoListCoordinator: UIViewControllerTransitioningDelegate {
     }
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        // Временная заглушка, пока не написали Dismiss-аниматор.
-        // Система закроет меню со стандартной системной анимацией альфы.
-        return nil
+        return ToDoMenuDismissAnimator(sourceCellRect: sourceCellRect)
     }
 }
 
@@ -71,20 +76,22 @@ extension ToDoListCoordinator: UIViewControllerTransitioningDelegate {
 private extension ToDoListCoordinator {
     
     /// Конфигурирует оверлей, замыкает UDF-каналы кнопок меню и презентует кастомный экран меню
-    func openItemMenu(for toDoItem: ToDoItem, rect: CGRect, router: any ToDoListRouter) {
+    func openItemMenu(for toDoItem: ToDoItem, rect: CGRect) {
         
         currentFlow = .ToDoItemMenu(item: toDoItem)
         sourceCellRect = rect
         
         let menuVC = container.resolve(ToDoItemMenuViewController.self)!
+        let toDoListViewController = container.resolve(ToDoListViewController.self)!
+        menuVC.onActionSelected = { menuAction in
+            toDoListViewController.presenter?.handleAction(.didSelectMenuAction(action: menuAction))
+        }
         
         menuVC.toDoItem = toDoItem
         menuVC.transitioningDelegate = self
         
-        // Накатываем данные на саму карточку перед показом
         menuVC.toDoItemView.configure(with: toDoItem)
         
         navigationController.present(menuVC, animated: true)
-        
     }
 }

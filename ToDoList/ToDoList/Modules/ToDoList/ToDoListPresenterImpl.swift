@@ -36,13 +36,23 @@ extension ToDoListPresenterImpl: ViewActionHandable {
             
         case .didLongTapItem(item: let viewModelItem, rect: let rect):
             guard let domainItem = interactor?.task(by: viewModelItem.id) else { return }
-            
-            log(message: "🎯 Поймали лонг-тап на id: \(viewModelItem.id), уводим в Роутер")
             router?.onRouteAction?(.openItemMenu(item: domainItem, rect: rect))
             
         case .didSelectMenuAction(action: let action):
-            // TODO: - Пробросить в Router
+            handleMenuAction(action: action)
+        }
+    }
+    
+    private func handleMenuAction(action: ToDoListItemMenuAction) {
+        switch action {
+        case .edit(let item):
             break
+        case .share(let item):
+            break
+        case .delete(let item):
+            interactor?.deleteTask(id: item.id)
+        case .dismiss:
+            router?.onRouteAction?(.dismisseItemMenu)
         }
     }
 }

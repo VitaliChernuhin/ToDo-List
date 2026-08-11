@@ -22,4 +22,6 @@ enum ToDoListRouteAction {
     
     /// Триггер глобального алерта ошибки на самом верхнем слое приложения
     case triggerErrorAlert(message: String)
+    
+    case dismisseItemMenu
 }

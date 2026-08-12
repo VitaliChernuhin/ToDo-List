@@ -13,6 +13,8 @@ final class ToDoItemMenuViewController: UIViewController {
     // MARK: - Callback Link
     var onActionSelected: ((ToDoListItemMenuAction) -> Void)?
     
+    var sourceItemRect: CGRect = .zero
+    
     // MARK: - UI Elements
     
     let dimmingView: UIView = {

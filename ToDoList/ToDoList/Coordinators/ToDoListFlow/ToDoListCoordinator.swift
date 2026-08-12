@@ -15,9 +15,6 @@ final class ToDoListCoordinator: NSObject, FlowCoordinator, Logable {
     
     private(set) var currentFlow: ToDoListNavigationFlow = .ToDoList
     
-    // Приватное свойство для временного удержания координат ячейки (нужно для Аниматора)
-    private var sourceCellRect: CGRect = .zero
-    
     init(navigationController: UINavigationController, container: Container) {
         self.navigationController = navigationController
         self.container = container
@@ -42,13 +39,10 @@ final class ToDoListCoordinator: NSObject, FlowCoordinator, Logable {
                     self.openItemMenu(for: toDoItem, rect: rect)
                     
                 case .dismisseItemMenu:
-                    guard navigationController.presentedViewController != nil
-                    else { return }
-                    navigationController.presentedViewController?.dismiss(animated: true) {
-                        self.currentFlow = .ToDoList
-                    }
+                    self.dismissItemMenu()
                     
-                case .triggerErrorAlert: break
+                case .triggerErrorAlert:
+                    break
                 }
             }
         }
@@ -63,26 +57,31 @@ extension ToDoListCoordinator: UIViewControllerTransitioningDelegate {
         presenting: UIViewController,
         source: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
-        log(message: "🚀 Запускаем кастомный ToDoMenuPresentAnimator для CGRect: \(sourceCellRect)")
-        return ToDoMenuPresentAnimator(sourceCellRect: sourceCellRect)
+        guard let menuVC = presented as? ToDoItemMenuViewController
+        else { return nil }
+        log(message: "🚀 Запускаем кастомный ToDoMenuPresentAnimator для CGRect: \(menuVC.sourceItemRect)")
+        return ToDoMenuPresentAnimator(sourceCellRect: menuVC.sourceItemRect)
     }
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return ToDoMenuDismissAnimator(sourceCellRect: sourceCellRect)
+        guard let menuVC = dismissed as? ToDoItemMenuViewController
+        else { return nil }
+        return ToDoMenuDismissAnimator(sourceCellRect: menuVC.sourceItemRect)
     }
 }
 
 // MARK: - Private Navigation Cascade (private)
 private extension ToDoListCoordinator {
     
-    /// Конфигурирует оверлей, замыкает UDF-каналы кнопок меню и презентует кастомный экран меню
     func openItemMenu(for toDoItem: ToDoItem, rect: CGRect) {
+        guard let toDoListViewController = currentToDoListViewController()
+        else { return }
         
         currentFlow = .ToDoItemMenu(item: toDoItem)
-        sourceCellRect = rect
         
         let menuVC = container.resolve(ToDoItemMenuViewController.self)!
-        let toDoListViewController = container.resolve(ToDoListViewController.self)!
+        menuVC.sourceItemRect = rect
+        
         menuVC.onActionSelected = { menuAction in
             toDoListViewController.presenter?.handleAction(.didSelectMenuAction(action: menuAction))
         }
@@ -93,5 +92,30 @@ private extension ToDoListCoordinator {
         menuVC.toDoItemView.configure(with: toDoItem)
         
         navigationController.present(menuVC, animated: true)
+    }
+    
+    func dismissItemMenu() {
+        guard navigationController.presentedViewController != nil else {
+            return
+        }
+        
+        navigationController.presentedViewController?.dismiss(animated: true) { [weak self] in
+            guard let self = self else { return }
+            self.currentFlow = .ToDoList
+        }
+    }
+}
+
+// MARK: - ViewControllers methods (private)
+private extension ToDoListCoordinator {
+    func currentToDoListViewController() -> ToDoListViewController? {
+        // Сначала проверяем, что сейчас вообще ожидаем этот экран по flow
+        guard currentFlow == .ToDoList else {
+            return nil
+        }
+        
+        return navigationController.viewControllers
+            .first { $0 is ToDoListViewController }
+            .flatMap { $0 as? ToDoListViewController }
     }
 }

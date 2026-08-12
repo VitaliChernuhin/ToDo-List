@@ -47,7 +47,7 @@ final class ToDoListAssembly: Assembly {
             interactor.presenter = presenter as? ToDoListInteractorOutput
             
             return viewController
-        }.inObjectScope(.container)
+        }.inObjectScope
         
         // 5. Собираем ViewController для меню
         container.register(ToDoItemMenuViewController.self) { resolver in

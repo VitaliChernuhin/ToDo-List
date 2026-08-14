@@ -6,10 +6,11 @@
 //
 
 enum ToDoListNavigationFlow {
-    case ToDoList
-    case ToDoItemMenu(item: ToDoItem)
-    case EditToDoItem(item: ToDoItem)
-    case NewToDoItem
+    case toDoList
+    case toDoItemMenu(item: ToDoItem)
+    case share(item: ToDoItem)
+    case editToDoItem(item: ToDoItem)
+    case newToDoItem
     case error(description: String)
 }
 
@@ -17,19 +18,22 @@ extension ToDoListNavigationFlow: Equatable {
     
     static func == (lhs: ToDoListNavigationFlow, rhs: ToDoListNavigationFlow) -> Bool {
         switch (lhs, rhs) {
-        case (.ToDoList, .ToDoList):
+        case (.toDoList, .toDoList):
             return true
             
-        case let (.ToDoItemMenu(lhsItem), .ToDoItemMenu(rhsItem)):
+        case let (.toDoItemMenu(lhsItem), .toDoItemMenu(rhsItem)):
             return lhsItem.id == rhsItem.id
             
-        case let (.EditToDoItem(lhsItem), .EditToDoItem(rhsItem)):
+        case let (.editToDoItem(lhsItem), .editToDoItem(rhsItem)):
             return lhsItem.id == rhsItem.id
             
-        case (.NewToDoItem, .NewToDoItem):
+        case (.newToDoItem, .newToDoItem):
             return true
             
         case let (.error(lhsDesc), .error(rhsDesc)):
+            return lhsDesc == rhsDesc
+            
+        case let (.share(lhsDesc), .share(item: rhsDesc)):
             return lhsDesc == rhsDesc
             
         default:

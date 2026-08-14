@@ -8,7 +8,7 @@
 import UIKit
 import Swinject
 
-final class AppCoordinator<Child: FlowCoordinator> {
+final class AppCoordinator<Child: FlowCoordinator>: Logable {
     
     private let window: UIWindow
     private let container: Container
@@ -41,15 +41,15 @@ private extension AppCoordinator where Child: ToDoListCoordinator {
         guard let currentFlowState = childCoordinator?.currentFlow else { return }
         
         switch currentFlowState {
-        case .ToDoItemMenu(let item):
-            print("📲 Обрабатываем диплинк \(url) для открытого меню задачи: \(item.title)")
+        case .toDoItemMenu(let item):
+            log(message: "📲 Обрабатываем диплинк \(url) для открытого меню задачи: \(item.title)")
             // Вызываем специфичные методы ToDoListCoordinator
             
-        case .EditToDoItem(let item):
-            print("📲 Юзер уже редактирует задачу \(item.id), обновляем контент диплинком")
+        case .editToDoItem(let item):
+            log(message: "📲 Юзер уже редактирует задачу \(item.id), обновляем контент диплинком")
             
-        case .ToDoList, .NewToDoItem, .error:
-            print("📲 Базовое состояние флоу задач, уводим на нужный экран")
+        case .toDoList, .newToDoItem, .error, .share:
+            log(message: "📲 Базовое состояние флоу задач, уводим на нужный экран")
         }
     }
 }

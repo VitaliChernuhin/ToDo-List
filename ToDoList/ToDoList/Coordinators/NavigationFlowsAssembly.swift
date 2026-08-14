@@ -13,6 +13,13 @@ final class NavigationFlowsAssembly: Assembly {
     
     func assemble(container: Container) {
         
+        container.register(AppCoordinator<ToDoListCoordinator>.self) { (resolver, window: UIWindow) in
+            return AppCoordinator(
+                window: window,
+                container: container
+            )
+        }.inObjectScope(.container)
+        
         container.register(ToDoListCoordinator.self) { (resolver, navigationController: UINavigationController) in
             return ToDoListCoordinator(
                 navigationController: navigationController,

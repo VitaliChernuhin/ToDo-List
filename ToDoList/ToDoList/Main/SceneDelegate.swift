@@ -12,22 +12,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    private let container = Container()
-    private var assembler: Assembler?
-    private var appCoordinator: AppCoordinator<ToDoListCoordinator>?
-    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
-        
-        assembler = Assembler([ServicesAssembly(),
-                               NavigationFlowsAssembly(),
-                               ToDoListAssembly()], container: container)
-        
-        let window = UIWindow(windowScene: windowScene)
-        self.window = window
-        
-        appCoordinator = AppCoordinator(window: window, container: container)
-        appCoordinator?.start()
+       guard let windowScene = (scene as? UIWindowScene) else { return }
+       
+       let container = Container()
+       _ = Assembler([
+           ServicesAssembly(),
+           NavigationFlowsAssembly(),
+           ToDoListAssembly()
+       ], container: container)
+       
+       let window = UIWindow(windowScene: windowScene)
+       self.window = window
+       
+       if let appCoordinator = container.resolve(AppCoordinator<ToDoListCoordinator>.self, argument: window) {
+           appCoordinator.start()
+       }
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

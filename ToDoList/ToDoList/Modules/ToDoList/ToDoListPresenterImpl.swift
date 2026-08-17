@@ -50,6 +50,7 @@ extension ToDoListPresenterImpl: ViewActionHandable {
         case .share(let item):
             router?.onRouteAction?(.share(item: item))
         case .delete(let item):
+            router?.onRouteAction?(.dismisseItemMenu)
             interactor?.deleteTask(id: item.id)
         case .dismiss:
             router?.onRouteAction?(.dismisseItemMenu)
